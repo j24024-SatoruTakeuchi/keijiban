@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Page</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #172033;
+      background: #f6f8fb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    main {
+      width: min(100%, 720px);
+      padding: 40px;
+      border: 1px solid #dce3ee;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 20px 60px rgba(23, 32, 51, 0.08);
+    }
+
+    p {
+      margin: 0;
+      color: #526075;
+      line-height: 1.8;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #0f766e;
+      background: #dff7f3;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="badge">Static Sample</div>
+    <h1>public/sample.html</h1>
+    <p>
+      このページは Google Apps Script とは接続しない、静的なサンプルページです。
+      フロントエンドの表示確認や nginx 配信確認に使えます。
+    </p>
+  </main>
+</body>
+</html>
