@@ -164,6 +164,18 @@ const getOpenRouterApiKey = () => {
   return apiKey;
 };
 
+const authorizeOpenRouter = () => {
+  const apiKey = getOpenRouterApiKey();
+  const res = UrlFetchApp.fetch('https://openrouter.ai/api/v1/models', {
+    headers: {
+      Authorization: 'Bearer ' + apiKey
+    },
+    muteHttpExceptions: true
+  });
+
+  return res.getResponseCode();
+};
+
 const listPosts = () => {
   const sheet = assertPostSheet();
   const lastRow = sheet.getLastRow();
