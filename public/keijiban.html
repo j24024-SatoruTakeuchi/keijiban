@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>掲示板</title>
+  <title>J24024の掲示板</title>
   <style>
     :root {
       color-scheme: light;
@@ -204,6 +204,61 @@
       overflow-wrap: anywhere;
     }
 
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .convert {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 14px;
+      border: 1px solid #bdd7d3;
+      border-radius: 8px;
+      color: #0f766e;
+      background: #f0fdfa;
+      font-size: 0.9rem;
+      font-weight: 800;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .convert:hover {
+      border-color: #5eead4;
+      background: #ccfbf1;
+    }
+
+    .convert:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    .converted {
+      display: none;
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border-left: 4px solid #14b8a6;
+      border-radius: 8px;
+      color: #244034;
+      background: #f0fdfa;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .converted.show {
+      display: block;
+    }
+
+    .converted.error {
+      border-left-color: #f04438;
+      color: #9f1f17;
+      background: #fff4f2;
+    }
+
     .empty {
       padding: 36px 20px;
       border: 1px dashed #c7d2e1;
@@ -237,7 +292,7 @@
   <main class="app">
     <header class="header">
       <div>
-        <h1 class="title">掲示板</h1>
+        <h1 class="title">J24024の掲示板</h1>
         <p class="subtitle">Google Apps Script とスプレッドシートに保存するシンプルな投稿欄です。</p>
       </div>
       <button class="refresh" type="button" id="refreshButton" aria-label="再読み込み" title="再読み込み">↻</button>
@@ -330,10 +385,53 @@
         message.className = 'message';
         message.textContent = post.message || '';
 
+        const actions = document.createElement('div');
+        actions.className = 'post-actions';
+
+        const convertButton = document.createElement('button');
+        convertButton.className = 'convert';
+        convertButton.type = 'button';
+        convertButton.textContent = '変換';
+        convertButton.dataset.postId = post.id || '';
+
+        const converted = document.createElement('p');
+        converted.className = 'converted';
+        converted.setAttribute('aria-live', 'polite');
+
+        actions.append(convertButton);
         header.append(name, date);
-        article.append(header, message);
+        article.append(header, message, actions, converted);
         postsElement.append(article);
       });
+    };
+
+    const convertPost = async (button) => {
+      const postId = button.dataset.postId;
+      const article = button.closest('.post');
+      const converted = article.querySelector('.converted');
+
+      if (!postId) {
+        converted.textContent = '投稿IDが取得できませんでした。';
+        converted.classList.add('show', 'error');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = '変換中...';
+      converted.textContent = 'やさしい言葉に変換しています...';
+      converted.classList.remove('error');
+      converted.classList.add('show');
+
+      try {
+        const data = await request({ mode: 'convert_message', id: postId });
+        converted.textContent = data.convertedMessage || '変換結果が空でした。';
+      } catch (error) {
+        converted.textContent = error.message;
+        converted.classList.add('error');
+      } finally {
+        button.disabled = false;
+        button.textContent = '変換';
+      }
     };
 
     const loadPosts = async () => {
@@ -377,6 +475,13 @@
     });
 
     refreshButton.addEventListener('click', loadPosts);
+    postsElement.addEventListener('click', (event) => {
+      const button = event.target.closest('.convert');
+
+      if (button) {
+        convertPost(button);
+      }
+    });
     loadPosts();
   </script>
 </body>
